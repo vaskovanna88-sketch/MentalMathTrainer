@@ -18,6 +18,29 @@ public class NumericMathExample : MathExample
         Unit = unit;
     }
 
+    public override string Kind => "numeric";
+
+    public override void WriteData(IDictionary<string, string> data)
+    {
+        data["value"] = Value.ToString(CultureInfo.InvariantCulture);
+        data["tolerance"] = Tolerance.ToString(CultureInfo.InvariantCulture);
+        if (!string.IsNullOrEmpty(Unit))
+            data["unit"] = Unit;
+    }
+
+    public override void ReadData(IReadOnlyDictionary<string, string> data)
+    {
+        Value = ReadNumber(data, "value");
+        Tolerance = ReadNumber(data, "tolerance");
+        Unit = data.TryGetValue("unit", out var unit) ? unit : "";
+    }
+
+    private static double ReadNumber(IReadOnlyDictionary<string, string> data, string key) =>
+        data.TryGetValue(key, out var text)
+        && double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
+            ? value
+            : 0;
+
     public override bool Check(string given)
     {
         if (!TryParseNumber(given, out var number))

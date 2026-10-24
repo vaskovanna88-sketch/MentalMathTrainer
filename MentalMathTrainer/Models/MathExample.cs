@@ -16,6 +16,15 @@ public abstract class MathExample
         Category = category;
     }
 
+    /// <summary>Позначка різновиду: під нею приклад пишуть у файл.</summary>
+    public abstract string Kind { get; }
+
+    /// <summary>Записує власні дані різновиду до словника.</summary>
+    public abstract void WriteData(IDictionary<string, string> data);
+
+    /// <summary>Читає власні дані різновиду зі словника.</summary>
+    public abstract void ReadData(IReadOnlyDictionary<string, string> data);
+
     /// <summary>Перевіряє відповідь. Кожен різновид виконує це по-своєму.</summary>
     public abstract bool Check(string given);
 

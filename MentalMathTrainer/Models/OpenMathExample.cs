@@ -19,6 +19,30 @@ public class OpenMathExample : MathExample
         Synonyms.AddRange(synonyms);
     }
 
+    public override string Kind => "open";
+
+    public override void WriteData(IDictionary<string, string> data)
+    {
+        data["answer"] = Answer;
+        foreach (var synonym in Synonyms)
+        {
+            if (synonym.Contains(';'))
+                throw new InvalidOperationException($"Написання «{synonym}» містить ';'.");
+        }
+        if (Synonyms.Count > 0)
+            data["synonyms"] = string.Join(";", Synonyms);
+    }
+
+    public override void ReadData(IReadOnlyDictionary<string, string> data)
+    {
+        Answer = data.TryGetValue("answer", out var answer) ? answer : "";
+        Synonyms.Clear();
+        if (data.TryGetValue("synonyms", out var synonyms))
+        {
+            Synonyms.AddRange(synonyms.Split(';', StringSplitOptions.RemoveEmptyEntries));
+        }
+    }
+
     public override bool Check(string given)
     {
         var value = given.Trim();
