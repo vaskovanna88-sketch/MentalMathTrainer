@@ -1,25 +1,29 @@
 namespace MentalMathTrainer.Models;
 
-/// <summary>Один математичний приклад для тренування.</summary>
-public class MathExample
+/// <summary>Спільна основа всіх математичних прикладів.</summary>
+public abstract class MathExample
 {
     public int Id { get; set; }
     public string Expression { get; set; } = "";
-    public string Answer { get; set; } = "";
     public string Category { get; set; } = "Загальна";
 
-    public MathExample() { }
+    protected MathExample() { }
 
-    public MathExample(int id, string expression, string answer, string category)
+    protected MathExample(int id, string expression, string category)
     {
         Id = id;
         Expression = expression;
-        Answer = answer;
         Category = category;
     }
 
-    public bool Check(string given) =>
-        string.Equals(given.Trim(), Answer.Trim(), StringComparison.CurrentCultureIgnoreCase);
+    /// <summary>Перевіряє відповідь. Кожен різновид виконує це по-своєму.</summary>
+    public abstract bool Check(string given);
+
+    /// <summary>Правильна відповідь текстом – для показу.</summary>
+    public abstract string CorrectAnswer { get; }
+
+    /// <summary>Підказка, як відповідати. Різновид може її змінити.</summary>
+    public virtual string Prompt => "Ваша відповідь";
 
     public override string ToString() => $"#{Id} [{Category}] Вираз: {Expression}";
 }

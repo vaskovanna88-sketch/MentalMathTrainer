@@ -1,45 +1,61 @@
 ﻿using System.Text;
 using MentalMathTrainer.Models;
+using MentalMathTrainer.Session;
 
 Console.OutputEncoding = Encoding.UTF8;
 Console.WriteLine("Тренажер усного рахунку");
 Console.WriteLine($"Платформа: {System.Runtime.InteropServices.RuntimeInformation.OSDescription}");
 Console.WriteLine();
 
-// Складання набору записів у пам'яті (колекція List<T>)
-var examples = new List<MathExample>
+var deck = new List<MathExample>
 {
-    new MathExample(1, "12 + 15", "27", "Додавання"),
-    new MathExample(2, "50 - 18", "32", "Віднімання"),
-    new MathExample(3, "7 * 8", "56", "Множення")
+    new OpenMathExample(1, "Столиця України", "Київ", "Географія", "Київ"),
+    new ChoiceMathExample(2, "Найбільше озеро світу", 3, "Географія", "Байкал", "Вікторія", "Каспійське море", "Гурон"),
+    new NumericMathExample(3, "Рік видання «Кобзаря»", 1840, 0, "Література"),
+    new NumericMathExample(4, "Приблизне значення Пі (округлено до сотих)", 3.14, 0.01, "Математика")
 };
 
-Console.WriteLine($"Прикладів у тренажері: {examples.Count}.");
+Console.WriteLine($"Прикладів у тренажері: {deck.Count}.");
 Console.WriteLine();
 
-// Збирання переліку за допомогою StringBuilder
 var list = new StringBuilder();
-foreach (var ex in examples)
+foreach (var ex in deck)
 {
     list.AppendLine($"  {ex}");
 }
 Console.Write(list.ToString());
 Console.WriteLine();
 
-// Цикл опитування користувача
-foreach (var ex in examples)
+var summary = new SessionSummary(0, 0);
+
+foreach (var card in deck)
 {
-    Console.WriteLine($"Обчисліть: {ex.Expression}");
-    Console.Write("Ваша відповідь: ");
+    Console.WriteLine();
+    Console.WriteLine($"Обчисліть / Дайте відповідь: {card.Expression}");
+
+    if (card is ChoiceMathExample choice)
+    {
+        for (var n = 1; n <= choice.Options.Count; n++)
+        {
+            Console.WriteLine($"  {n}. {choice[n]}");
+        }
+    }
+
+    Console.Write($"{card.Prompt}: ");
     var given = Console.ReadLine() ?? "";
 
-    if (ex.Check(given))
+    var isCorrect = card.Check(given);
+    summary += isCorrect;
+
+    if (isCorrect)
     {
         Console.WriteLine("Правильно! Молодець.");
     }
     else
     {
-        Console.WriteLine($"Ні. Правильна відповідь: {ex.Answer}");
+        Console.WriteLine($"Ні. Правильна відповідь: {card.CorrectAnswer}");
     }
-    Console.WriteLine();
 }
+
+Console.WriteLine();
+Console.WriteLine($"Підсумок: {summary.Correct} з {summary.Asked} ({summary.Percent:F0}%). Правильних: {summary.Correct}, Помилок: {summary.Wrong}.");
